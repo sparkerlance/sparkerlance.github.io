@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>修復 Hexo Butterfly 主題的 Busuanzi 訪客計數問題</title>
+      <link href="/2025/11/11/hexo-fix-busuanzi/"/>
+      <url>/2025/11/11/hexo-fix-busuanzi/</url>
+      
+        <content type="html"><![CDATA[<p>在使用 Hexo 的 Butterfly 主題時，我遇到了 <strong>Busuanzi 訪客計數無法正常顯示</strong> 的問題。經過檢查發現，Butterfly 當前支線的 Busuanzi URL 錯誤，因此需要手動注入腳本來解決。</p><h2 id="問題現象"><a href="#問題現象" class="headerlink" title="問題現象"></a>問題現象</h2><ul><li>網頁上的訪客數、頁面瀏覽數無法顯示。</li><li>F12 開發者工具看到錯誤：<code>Uncaught SyntaxError: Unexpected token &#39;&lt;&#39;</code>。</li><li>原因是主題預設的 Busuanzi CDN URL 錯誤或不可用。</li></ul><h2 id="解決方法"><a href="#解決方法" class="headerlink" title="解決方法"></a>解決方法</h2><ol><li><strong>在 Butterfly 配置中啟用 Busuanzi 訪客計數：</strong></li></ol><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">busuanzi:</span></span><br><span class="line">  <span class="attr">site_uv:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">site_pv:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">page_pv:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure><ol start="2"><li><strong>手動 inject 正確的 Busuanzi 腳本到頁面底部：</strong></li></ol><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Inject</span></span><br><span class="line"><span class="comment"># Insert the code to head (before &#x27;&lt;/head&gt;&#x27; tag) and the bottom (before &#x27;&lt;/body&gt;&#x27; tag)</span></span><br><span class="line"><span class="attr">inject:</span></span><br><span class="line">  <span class="attr">head:</span></span><br><span class="line">    <span class="comment"># - &lt;link rel=&quot;stylesheet&quot; href=&quot;/xxx.css&quot;&gt;</span></span><br><span class="line">  <span class="attr">bottom:</span></span><br><span class="line">    <span class="comment"># - &lt;script src=&quot;xxxx&quot;&gt;&lt;/script&gt;</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">&lt;script</span> <span class="string">src=&quot;https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js&quot;&gt;&lt;/script&gt;</span></span><br></pre></td></tr></table></figure><blockquote><p>這裡手動 inject 是因為 clone 當前 Butterfly 支線的 Busuanzi CDN URL 錯誤，需要改成使用這個可用的 URL。</p></blockquote><ol start="3"><li><strong>結果：</strong></li></ol><ul><li>網站的訪客數 (UV)、站點總瀏覽數 (PV)、單頁瀏覽數 (page PV) 都能正常顯示。</li><li>不再出現 <code>&lt;script&gt;</code> 相關的錯誤。(因為Busuanzi網址錯誤導致請求回復404的html，理論上成功時是回復js)</li></ul><h2 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h2><p>當遇到 Hexo Butterfly 主題某些功能無法使用時，可以透過手動注入腳本的方法解決，尤其是第三方統計工具的 CDN URL 錯誤或過期的情況。  </p><p>簡單生活，生活簡單~</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 網站 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Hexo </tag>
+            
+            <tag> Butterfly </tag>
+            
+            <tag> Busuanzi </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Hello World</title>
+      <link href="/2025/11/11/hello-world/"/>
+      <url>/2025/11/11/hello-world/</url>
+      
+        <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+  
+  
+</search>
