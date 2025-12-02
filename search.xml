@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>讓我們一起用 Defold 來開發遊戲</title>
+      <link href="/2025/12/02/dgd-0-defold-game-development-introduction/"/>
+      <url>/2025/12/02/dgd-0-defold-game-development-introduction/</url>
+      
+        <content type="html"><![CDATA[<h1 id="第一章：選擇-Defold-的原因"><a href="#第一章：選擇-Defold-的原因" class="headerlink" title="第一章：選擇 Defold 的原因"></a>第一章：選擇 Defold 的原因</h1><p>在 Steam 玩遊戲模組(Mod)時，我接觸了 Lua。<br>玩 <strong>符文工廠 3</strong> 時，我被它的插件式代碼結構所驚嘆。<br>這款遊戲玩家可以輕鬆自定義事件內容，更換頭像或物件圖片，而不改動遊戲原本代碼。</p><p>我希望自己的遊戲也能像許多在 Steam 上擁有「創意工坊」的遊戲一樣，讓玩家自由擴充內容。<br>在研究如何實現這個目標時，我發現 <strong>Lua</strong> 是最符合我需求的程式語言。<br>由 C++ 封裝的開源引擎 <strong>Defold</strong>，效能出色、使用 Lua 並支持網頁輸出，完美的符合了我的需求。</p><p>雖然 <strong>Godot</strong> 也支持網頁輸出，但只能使用 <strong>GDScript</strong>。<br>因為喜歡 Lua 的靈活、「自由」的理念，讓我選擇了 <strong>Defold</strong>。</p><hr><p>在使用 Defold 之前，我先嘗試了同樣用Lua的兩款遊戲引擎<strong>Love2D</strong> 和 <strong>Cocos2D-x</strong><br>我用兩者開發了幾款小遊戲，作為選擇大型專案引擎時的參考。<br>這兩款引擎在純代碼控制上非常好用，但網頁輸出比較麻煩，需要額外轉換。</p><p>我不喜歡「造輪子」，更希望把時間花在 <strong>真正做遊戲</strong> 上。<br>快速迭代、打造有趣體驗，才是我的目標。<br>比較過 <strong>Godot、Unity、Defold</strong> 的網頁輸出後，我發現 <strong>Defold</strong> 最符合我的需求：  </p><ul><li>最輕量的輸出大小(small size)</li><li>使用 <strong>Lua</strong>，符合我對腳本靈活性的喜好  </li><li>跨平台與網頁輸出方便  </li><li>工作流程接近 <strong>Unity</strong>，容易上手</li><li>開源、透明，正如我喜歡 <strong>Blender</strong> 的理念</li></ul><p>因此，我選擇用<strong>Defold</strong>開發遊戲。</p><hr><h1 id="Defold-的誕生與起源"><a href="#Defold-的誕生與起源" class="headerlink" title="Defold 的誕生與起源"></a>Defold 的誕生與起源</h1><p>Defold 最早是由 <strong>兩位瑞典開發者 Ragnar Svensson 與 Christian Murray</strong> 在 2008 年左右開始開發的一套內部工具。<br>一開始，它並不是一個面向大眾的遊戲引擎，而是提供給他們自己的團隊來「快速製作 2D 遊戲」。</p><p>後來，這項技術被看到潛力，於是 Defold 在 2014 年被 King（就是《Candy Crush Saga》 開發公司）收購，用來擴大公司內部的跨平台遊戲製作能力。</p><hr><h1 id="Defold-的發展與開源"><a href="#Defold-的發展與開源" class="headerlink" title="Defold 的發展與開源"></a>Defold 的發展與開源</h1><p>2016 年，King 決定把 Defold <strong>免費公開給所有開發者使用</strong>。<br>到了 2020 年，Defold 更進一步轉變成 <strong>完全開源（Source Available）</strong> 的引擎，並交由 Defold 基金會管理。</p><p>這意味著：</p><ul><li>引擎核心透明、可以自由研究  </li><li>永久免費  </li><li>不抽成（No Royalties）  </li><li>可跨平台（桌面、行動、HTML5 等）  </li><li>使用輕量的 <strong>Lua</strong> 作為腳本語言</li></ul><hr><h1 id="為什麼是-Defold？"><a href="#為什麼是-Defold？" class="headerlink" title="為什麼是 Defold？"></a>為什麼是 Defold？</h1><p>總結而言，我選擇 Defold 的原因非常簡單：</p><ol><li><strong>我喜歡 Lua</strong> —— 從 Steam 上的模組開始學習 Lua 腳本，逐漸熟悉遊戲開發  </li><li><strong>Defold 輕量、快速、舒服</strong> —— 不臃腫，不吃硬體，不需要漫長安裝  </li><li><strong>跨平台超方便</strong> —— 一次開發，多平台輸出  </li><li><strong>社群活躍且資源豐富</strong> —— 包含 Druid、Tweener、Saver、Panthera 等成熟套件  </li><li><strong>喜歡開源、透明的生態</strong> —— 正如我喜歡 <strong>Blender</strong> 一樣</li></ol><p>接下來，我會記錄如何使用 <strong>Defold</strong> 打造支援 Steam 創意工坊的<strong>遊戲模板</strong>。<br>讓我們一起 <strong>Defold 啟動！</strong></p><hr>]]></content>
+      
+      
+      <categories>
+          
+          <category> 遊戲開發 </category>
+          
+          <category> Game Development </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Defold </tag>
+            
+            <tag> Lua </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>修復 Hexo Butterfly 主題的 Busuanzi 訪客計數問題</title>
       <link href="/2025/11/11/hexo-fix-busuanzi/"/>
       <url>/2025/11/11/hexo-fix-busuanzi/</url>
