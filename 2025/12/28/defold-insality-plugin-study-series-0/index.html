@@ -1,0 +1,472 @@
+<!DOCTYPE html><html lang="zh-TW" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>defold plugin study series [0] | lua and pixelart</title><meta name="author" content="sparkerlance"><meta name="copyright" content="sparkerlance"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Defold 插件研究 系列目錄研究目的建立架構清晰、權責分明的開發框架，確保專案可擴展、易於閱讀，並方便後續添加或修改功能。 簡介DefoldDefold 是一個輕量級 2D &#x2F; 3D 遊戲引擎，適合快速開發遊戲。官方網站：https:&#x2F;&#x2F;defold.com InsalityInsality 是提供了一系列插件的作者，例如 Event、Decore、Druid 等。GitHub：ht">
+<meta property="og:type" content="article">
+<meta property="og:title" content="defold plugin study series [0]">
+<meta property="og:url" content="https://sparkerlance.github.io/2025/12/28/defold-insality-plugin-study-series-0/index.html">
+<meta property="og:site_name" content="lua and pixelart">
+<meta property="og:description" content="Defold 插件研究 系列目錄研究目的建立架構清晰、權責分明的開發框架，確保專案可擴展、易於閱讀，並方便後續添加或修改功能。 簡介DefoldDefold 是一個輕量級 2D &#x2F; 3D 遊戲引擎，適合快速開發遊戲。官方網站：https:&#x2F;&#x2F;defold.com InsalityInsality 是提供了一系列插件的作者，例如 Event、Decore、Druid 等。GitHub：ht">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://sparkerlance.github.io/img/icon.png">
+<meta property="article:published_time" content="2025-12-28T06:30:00.000Z">
+<meta property="article:modified_time" content="2025-12-28T07:09:24.000Z">
+<meta property="article:author" content="sparkerlance">
+<meta property="article:tag" content="defold">
+<meta property="article:tag" content="ecs">
+<meta property="article:tag" content="event-system">
+<meta property="article:tag" content="game-architecture">
+<meta property="article:tag" content="insality">
+<meta property="article:tag" content="localization">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sparkerlance.github.io/img/icon.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "defold plugin study series [0]",
+  "url": "https://sparkerlance.github.io/2025/12/28/defold-insality-plugin-study-series-0/",
+  "image": "https://sparkerlance.github.io/img/icon.png",
+  "datePublished": "2025-12-28T06:30:00.000Z",
+  "dateModified": "2025-12-28T07:09:24.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "sparkerlance",
+      "url": "https://sparkerlance.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://sparkerlance.github.io/2025/12/28/defold-insality-plugin-study-series-0/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.2"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"找不到符合您查詢的內容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '複製成功',
+    error: '複製失敗',
+    noSupport: '瀏覽器不支援'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '剛剛',
+    min: '分鐘前',
+    hour: '小時前',
+    day: '天前',
+    month: '個月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: '載入更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'defold plugin study series [0]',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">lua and pixelart</span></a><a class="nav-page-title" href="/"><span class="site-name">defold plugin study series [0]</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首頁</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜尋</span></span></div></div></nav><div id="post-info"><h1 class="post-title">defold plugin study series [0]</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">發表於</span><time class="post-meta-date-created" datetime="2025-12-28T06:30:00.000Z" title="發表於 2025-12-28 14:30:00">2025-12-28</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新於</span><time class="post-meta-date-updated" datetime="2025-12-28T07:09:24.000Z" title="更新於 2025-12-28 15:09:24">2025-12-28</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">瀏覽量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="Defold-插件研究-系列目錄"><a href="#Defold-插件研究-系列目錄" class="headerlink" title="Defold 插件研究 系列目錄"></a>Defold 插件研究 系列目錄</h1><h2 id="研究目的"><a href="#研究目的" class="headerlink" title="研究目的"></a>研究目的</h2><p>建立架構清晰、權責分明的開發框架，<br>確保專案可擴展、易於閱讀，並方便後續添加或修改功能。</p>
+<h2 id="簡介"><a href="#簡介" class="headerlink" title="簡介"></a>簡介</h2><h3 id="Defold"><a href="#Defold" class="headerlink" title="Defold"></a>Defold</h3><p>Defold 是一個輕量級 2D &#x2F; 3D 遊戲引擎，適合快速開發遊戲。<br>官方網站：<a target="_blank" rel="noopener" href="https://defold.com/">https://defold.com</a></p>
+<h3 id="Insality"><a href="#Insality" class="headerlink" title="Insality"></a>Insality</h3><p>Insality 是提供了一系列插件的作者，例如 Event、Decore、Druid 等。<br>GitHub：<a target="_blank" rel="noopener" href="https://github.com/Insality">https://github.com/Insality</a></p>
+<h2 id="系列概述"><a href="#系列概述" class="headerlink" title="系列概述"></a>系列概述</h2><h3 id="目標讀者"><a href="#目標讀者" class="headerlink" title="目標讀者"></a>目標讀者</h3><ul>
+<li>已掌握基本 Lua 與 Defold 開發流程的遊戲開發者  </li>
+<li>對 ECS 架構、插件應用與專案設計有興趣的開發者  </li>
+<li>希望建立可維護、可擴展遊戲專案架構的開發者</li>
+</ul>
+<h3 id="內容概述"><a href="#內容概述" class="headerlink" title="內容概述"></a>內容概述</h3><ul>
+<li>系列文章逐個介紹 Insality 的 Defold 插件<br>（Event、Decore、Druid、Panthera、Saver、Quest、Detiled、Lang）  </li>
+<li>每個插件包含：研究目標、Checklist、最小實驗、使用建議與架構設計</li>
+</ul>
+<h3 id="章節目標"><a href="#章節目標" class="headerlink" title="章節目標"></a>章節目標</h3><ul>
+<li>理解各插件用途與設計理念，避免僅照抄範例  </li>
+<li>學會在實際專案中解耦系統與 UI、動畫、存檔、任務等  </li>
+<li>掌握 ECS 架構與事件驅動的最佳實踐，提高專案可維護性</li>
+</ul>
+<h3 id="完成收穫"><a href="#完成收穫" class="headerlink" title="完成收穫"></a>完成收穫</h3><ul>
+<li>建立專案架構清晰、權責分明、可擴展的 Defold 專案  </li>
+<li>清楚掌握每個插件使用時機與與其他系統整合方式  </li>
+<li>能快速搭建測試小專案驗證功能，方便未來擴展與修改</li>
+</ul>
+<hr>
+<h2 id="Insality-插件一覽"><a href="#Insality-插件一覽" class="headerlink" title="Insality 插件一覽"></a>Insality 插件一覽</h2><table>
+<thead>
+<tr>
+<th>連結</th>
+<th>插件名稱</th>
+<th>簡短說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Insality/defold-event">https://github.com/Insality/defold-event</a></td>
+<td>Event</td>
+<td>跨 Context 事件系統，用於解耦 System &#x2F; UI &#x2F; Animation。</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Insality/decore">https://github.com/Insality/decore</a></td>
+<td>Decore</td>
+<td>ECS 核心框架，純資料 Component 與 System 分離。</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Insality/druid">https://github.com/Insality/druid</a></td>
+<td>Druid</td>
+<td>UI 框架，UI 只發事件 &#x2F; 顯示資料，不直接操作 ECS。</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Insality/panthera">https://github.com/Insality/panthera</a></td>
+<td>Panthera</td>
+<td>動畫狀態機，動畫事件驅動 Gameplay。</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Insality/defold-saver">https://github.com/Insality/defold-saver</a></td>
+<td>Saver</td>
+<td>存檔系統，ECS 資料序列化與還原。</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Insality/defold-quest">https://github.com/Insality/defold-quest</a></td>
+<td>Quest</td>
+<td>任務系統，事件驅動任務進度管理。</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Insality/detiled">https://github.com/Insality/detiled</a></td>
+<td>Detiled</td>
+<td>Tiled → ECS 的地圖生成工具。</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Insality/defold-lang">https://github.com/Insality/defold-lang</a></td>
+<td>Lang</td>
+<td>多語系文本管理插件，簡化 UI 與 ECS 文字綁定。</td>
+</tr>
+</tbody></table>
+<h2 id="關於Insality插件建議的研究順序"><a href="#關於Insality插件建議的研究順序" class="headerlink" title="關於Insality插件建議的研究順序"></a>關於Insality插件建議的研究順序</h2><p>Event → Decore → Druid → Panthera → Saver → Quest → Lang → Detiled(視需求)</p>
+<p>每篇文章包含：</p>
+<ul>
+<li>研究目標</li>
+<li>Checklist（必做項目）</li>
+<li>不建議做的事項</li>
+<li>最小實驗（Hands-on demo）</li>
+<li>開發前與階段性確認事項</li>
+</ul>
+<hr>
+<h4 id="1-Event（跨-Context-事件系統）"><a href="#1-Event（跨-Context-事件系統）" class="headerlink" title="1. Event（跨 Context 事件系統）"></a>1. Event（跨 Context 事件系統）</h4><p><strong>研究目標</strong><br>取代 msg.post 做邏輯層事件，解耦 System &#x2F; UI &#x2F; Animation</p>
+<p><strong>Checklist</strong>  </p>
+<ul>
+<li>建立 global event bus</li>
+<li>System 訂閱事件</li>
+<li>UI 發送事件（例如 button click）</li>
+<li>Animation event → Event</li>
+<li>確認 event scope（local &#x2F; global）</li>
+</ul>
+<p><strong>不建議</strong>  </p>
+<ul>
+<li>用 Event 傳高頻資料（每幀 position）</li>
+</ul>
+<p><strong>最小實驗</strong>  </p>
+<ul>
+<li>按按鈕 → 發送 event → ECS System 接收 → 改變 entity 狀態</li>
+</ul>
+<hr>
+<h4 id="2-Decore（ECS-核心）"><a href="#2-Decore（ECS-核心）" class="headerlink" title="2. Decore（ECS 核心）"></a>2. Decore（ECS 核心）</h4><p><strong>研究目標</strong><br>純資料 Component，邏輯全在 System，熟悉 filter &amp; entities cache</p>
+<p><strong>Checklist</strong>  </p>
+<ul>
+<li>自己寫 3 個 component（只有 data）</li>
+<li>自己寫 3 個 system</li>
+<li>動態新增 &#x2F; 移除 component</li>
+<li>System filter 生效條件</li>
+<li>多個 system 同時作用在 entity</li>
+<li>不在 component 裡寫邏輯</li>
+</ul>
+<p><strong>最小實驗</strong>  </p>
+<ul>
+<li>Top-down 移動 + 撿道具 + 刪除 entity</li>
+</ul>
+<hr>
+<h4 id="3-Druid（UI-框架）"><a href="#3-Druid（UI-框架）" class="headerlink" title="3. Druid（UI 框架）"></a>3. Druid（UI 框架）</h4><p><strong>研究目標</strong><br>UI 不直接碰 ECS，UI 只發事件 &#x2F; 顯示資料</p>
+<p><strong>Checklist</strong>  </p>
+<ul>
+<li>建立基本 UI screen</li>
+<li>使用 component（button &#x2F; text）</li>
+<li>UI → Event → ECS</li>
+<li>ECS 資料 → UI 更新（透過 Event）</li>
+<li>UI lifecycle（init &#x2F; update &#x2F; final）</li>
+</ul>
+<p><strong>不建議</strong>  </p>
+<ul>
+<li>UI 直接操作 entity</li>
+</ul>
+<p><strong>最小實驗</strong>  </p>
+<ul>
+<li>HP 改變 → 發 event → UI 血條更新</li>
+</ul>
+<hr>
+<h4 id="4-Panthera-2-0（動畫狀態機）"><a href="#4-Panthera-2-0（動畫狀態機）" class="headerlink" title="4. Panthera 2.0（動畫狀態機）"></a>4. Panthera 2.0（動畫狀態機）</h4><p><strong>研究目標</strong><br>動畫 &#x3D; 狀態，動畫事件 &#x3D; Gameplay 觸發點</p>
+<p><strong>Checklist</strong>  </p>
+<ul>
+<li>建立 state machine</li>
+<li>切換 idle &#x2F; move &#x2F; attack</li>
+<li>使用 animation event</li>
+<li>animation event → Event → ECS</li>
+<li>ECS 狀態影響動畫</li>
+</ul>
+<p><strong>最小實驗</strong>  </p>
+<ul>
+<li>攻擊動畫第 3 幀 → 產生 hitbox</li>
+</ul>
+<hr>
+<h4 id="5-Saver（存檔系統）"><a href="#5-Saver（存檔系統）" class="headerlink" title="5. Saver（存檔系統）"></a>5. Saver（存檔系統）</h4><p><strong>研究目標</strong><br>ECS 資料序列化，解耦 Save &#x2F; Load 與 Gameplay</p>
+<p><strong>Checklist</strong>  </p>
+<ul>
+<li>儲存 player 狀態</li>
+<li>只存 component data</li>
+<li>Load 後還原 entity</li>
+<li>處理版本變化（schema）</li>
+</ul>
+<p><strong>最小實驗</strong>  </p>
+<ul>
+<li>關遊戲 → 再開 → player position 還原</li>
+</ul>
+<hr>
+<h4 id="6-Quest（任務系統）"><a href="#6-Quest（任務系統）" class="headerlink" title="6. Quest（任務系統）"></a>6. Quest（任務系統）</h4><p><strong>研究目標</strong><br>任務 &#x3D; 狀態機 + 事件驅動</p>
+<p><strong>Checklist</strong>  </p>
+<ul>
+<li>定義 quest flow</li>
+<li>Event 觸發任務進度</li>
+<li>Quest 完成發事件</li>
+<li>Quest 與 ECS 解耦</li>
+</ul>
+<p><strong>最小實驗</strong>  </p>
+<ul>
+<li>撿 3 個道具 → 任務完成</li>
+</ul>
+<hr>
+<h4 id="7-Detiled（Tiled-→-ECS）"><a href="#7-Detiled（Tiled-→-ECS）" class="headerlink" title="7. Detiled（Tiled → ECS）"></a>7. Detiled（Tiled → ECS）</h4><p><strong>研究目標</strong><br>地圖 &#x3D; 資料，地圖生成 entity</p>
+<p><strong>Checklist</strong>  </p>
+<ul>
+<li>從 Tiled 讀資料</li>
+<li>Object layer → ECS entity</li>
+<li>自動加 component</li>
+<li>和 Decore system 協作</li>
+</ul>
+<p><strong>最小實驗</strong>  </p>
+<ul>
+<li>Tiled 放敵人 → 遊戲自動生成</li>
+</ul>
+<hr>
+<h4 id="8-Lang（Defold-Localization-語言插件）"><a href="#8-Lang（Defold-Localization-語言插件）" class="headerlink" title="8. Lang（Defold Localization &#x2F; 語言插件）"></a>8. Lang（Defold Localization &#x2F; 語言插件）</h4><p><strong>研究目標</strong><br>管理遊戲多語系文本，簡化 UI 與 ECS 顯示文字的綁定</p>
+<p><strong>Checklist</strong>  </p>
+<ul>
+<li>建立語言檔（JSON &#x2F; Lua table）</li>
+<li>定義 key → text 映射</li>
+<li>文字更新自動刷新 UI</li>
+<li>多語系切換測試</li>
+<li>與 Event 系統結合（語言切換事件）</li>
+</ul>
+<p><strong>不建議</strong>  </p>
+<ul>
+<li>將業務邏輯綁定在語言檔</li>
+</ul>
+<p><strong>最小實驗</strong>  </p>
+<ul>
+<li>切換語言 → UI text 自動更新</li>
+</ul>
+<hr>
+<h2 id="開發前與階段性確認事項（系列共通）"><a href="#開發前與階段性確認事項（系列共通）" class="headerlink" title="開發前與階段性確認事項（系列共通）"></a>開發前與階段性確認事項（系列共通）</h2><h3 id="開發前確認事項"><a href="#開發前確認事項" class="headerlink" title="開發前確認事項"></a>開發前確認事項</h3><p>開始研究或使用每個插件前，可評估以下事項：</p>
+<ul>
+<li>插件是否必要，缺少它會失去哪些功能</li>
+<li>插件的責任層是否清楚，與其他系統是否解耦</li>
+<li>插件的使用範圍與限制是否清楚</li>
+</ul>
+<h3 id="階段性確認事項"><a href="#階段性確認事項" class="headerlink" title="階段性確認事項"></a>階段性確認事項</h3><p>完成插件研究或小專案後，可確認以下項目：</p>
+<ul>
+<li>功能是否符合預期</li>
+<li>是否按照 ECS &#x2F; Event &#x2F; 系統架構保持權責分明</li>
+<li>是否容易擴展或修改</li>
+<li>是否有明確的測試或最小實驗驗證</li>
+</ul>
+<hr>
+<h2 id="建議總控-Repo"><a href="#建議總控-Repo" class="headerlink" title="建議總控 Repo"></a>建議總控 Repo</h2><p>完成 2–3 個插件研究後，可建立 repo：</p>
+<p>&#x2F;architecture_lab<br>├─ ecs_basic<br>├─ ecs_event<br>├─ ecs_ui<br>├─ ecs_animation<br>└─ ecs_save</p>
+<p>每個資料夾對應一個可執行的小專案，用於實驗與驗收。<br>這些小專案可用來實際操作插件功能、檢驗 Checklist 項目是否正確運作，<br>熟悉各系統之間的互動與解耦方式，完成後可直接應用於大型專案。</p>
+<h2 id="完整列表上實作後，將得到什麼？"><a href="#完整列表上實作後，將得到什麼？" class="headerlink" title="完整列表上實作後，將得到什麼？"></a>完整列表上實作後，將得到什麼？</h2><ul>
+<li>從 <strong>「學習插件怎麼用」</strong>  </li>
+<li>到 <strong>「打造專案骨架」</strong></li>
+</ul>
+<p>能建立一套 <strong>架構清楚、責任分明、可長期維護的 Defold 專案骨架</strong>。</p>
+<h3 id="核心能力包括："><a href="#核心能力包括：" class="headerlink" title="核心能力包括："></a>核心能力包括：</h3><ul>
+<li><p><strong>插件整合與理解</strong><br>理解每個插件在整體架構中的位置、責任與邊界，而不僅僅是使用範例。</p>
+</li>
+<li><p><strong>功能與系統判斷（MVC &#x2F; MVCS &#x2F; MVVM 對應）</strong><br>開發新功能時，可依照架構分層判斷放置位置：</p>
+</li>
+</ul>
+<hr>
+<h4 id="Presentation-層（View-ViewController）"><a href="#Presentation-層（View-ViewController）" class="headerlink" title="- Presentation 層（View &#x2F; ViewController）"></a>- Presentation 層（View &#x2F; ViewController）</h4><ul>
+<li>負責接收使用者輸入</li>
+<li>顯示畫面與狀態</li>
+<li>可以調用命令 (Command)</li>
+<li>可以訂閱&#x2F;監聽事件 (Event)</li>
+<li>不直接自行改變 Model</li>
+</ul>
+<h4 id="System-層"><a href="#System-層" class="headerlink" title="- System 層"></a>- System 層</h4><ul>
+<li>負責共用邏輯處理（如計時、商城、任務系統等）</li>
+<li>接收事件並執行邏輯</li>
+<li>發送事件通知其他層</li>
+</ul>
+<h4 id="Data-層（Model）"><a href="#Data-層（Model）" class="headerlink" title="- Data 層（Model）"></a>- Data 層（Model）</h4><ul>
+<li>定義資料結構</li>
+<li>提供 CRUD 行為</li>
+<li>透過事件告知資料變更</li>
+</ul>
+<h4 id="Utility-層"><a href="#Utility-層" class="headerlink" title="- Utility 層"></a>- Utility 層</h4><ul>
+<li>提供基礎設施（儲存、序列化、網路等）</li>
+<li>不處理遊戲邏輯</li>
+</ul>
+<p>明確規範：</p>
+<ul>
+<li>上層可以直接調用下層，但下層不直接依賴上層  </li>
+<li>State 改變後的通知必須用事件  </li>
+<li>改變狀態必須用 Command</li>
+</ul>
+<h3 id="事件與指令（Command-Event）"><a href="#事件與指令（Command-Event）" class="headerlink" title="- 事件與指令（Command &#x2F; Event）"></a>- 事件與指令（Command &#x2F; Event）</h3><p>這是架構核心，用來實現解耦與流程分離：</p>
+<ul>
+<li><p><strong>Command</strong></p>
+<ul>
+<li>代表「要做什麼」的操作指令（不可有狀態）</li>
+<li>由上層（例如 View &#x2F; Controller）發出</li>
+<li>系統 &#x2F; Model 在收到 Command 後進行行為改變</li>
+<li>Command 本身可以再觸發 Event</li>
+</ul>
+</li>
+<li><p><strong>Event</strong></p>
+<ul>
+<li>代表「事情已經發生」</li>
+<li>由 Model &#x2F; System 發出</li>
+<li>可由 Presentation、System、Model 層訂閱</li>
+<li>用於狀態通知與跨層溝通</li>
+</ul>
+</li>
+</ul>
+<p>這樣的設計可以達成：</p>
+<ul>
+<li>操作與狀態分離（CQRS 思維）  </li>
+<li>改變狀態必須用 Command（避免直接呼叫改資料）  </li>
+<li>狀態改變後通知所有訂閱者（Event 機制）</li>
+</ul>
+<p>📌 <strong>用一句話總結</strong>  </p>
+<pre>
+Command 負責下達意圖，Event 負責廣播已完成的狀態改變；  
+上層發送 Command，底層接收 Event；  
+Model/Logic 與 UI 之間透過事件溝通，而不直接耦合。
+</pre>
+
+<hr>
+<ul>
+<li><p><strong>最小實驗驗證</strong><br>先做 mini project 驗證設計，再回到主專案延伸功能，保持專案穩定性。</p>
+</li>
+<li><p><strong>維護與擴展能力</strong><br>對於新增玩法、重構系統或接手舊專案，能快速定位問題，而不增加額外風險。</p>
+</li>
+</ul>
+<p>這系列筆記，目標是記錄 <strong>從單功能實作</strong> 到 <strong>專案架構設計</strong> 的完整過程。</p>
+<p>在過程中將一個個完成列表上的小專案，然後在每個後續專案復用之前的成果，<br>並在架構之上持續優化。</p>
+<blockquote>
+<p><strong>讓我們一起走上可維護、可擴展的 Defold 遊戲開發之路。</strong></p>
+</blockquote>
+<hr>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://sparkerlance.github.io">sparkerlance</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章連結: </span><span class="post-copyright-info"><a href="https://sparkerlance.github.io/2025/12/28/defold-insality-plugin-study-series-0/">https://sparkerlance.github.io/2025/12/28/defold-insality-plugin-study-series-0/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版權聲明: </span><span class="post-copyright-info">本部落格所有文章除特別聲明外，均採用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 授權協議。轉載請註明來源 <a href="https://sparkerlance.github.io" target="_blank">lua and pixelart</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/defold/">defold</a><a class="post-meta__tags" href="/tags/ecs/">ecs</a><a class="post-meta__tags" href="/tags/event-system/">event-system</a><a class="post-meta__tags" href="/tags/insality/">insality</a><a class="post-meta__tags" href="/tags/game-architecture/">game-architecture</a><a class="post-meta__tags" href="/tags/localization/">localization</a></div><div class="post-share"><div class="social-share" data-image="/img/icon.png" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/12/28/defold-msg-vs-event/" title="msg vs event"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">msg vs event</div></div><div class="info-2"><div class="info-item-1">為什麼 Defold 已經有了內建的消息系統 msg.post，實務中還使用了額外的 Event 系統？ 本文所指 “額外的 Event 系統”，是由 Insality 編寫的 defold-eventhttps://github.com/Insality/defold-event   以下討論皆基於此類「架構層事件系統」的設計思路，而非 Defold 引擎內建的 msg 機制。   一句話結論 msg 是 Defold 的「引擎級訊息系統」Event（如 defold-event）是「遊戲架構層的事件系統」 兩者並不重複，而是層級與責任不同。   一、什麼是 msg？msg 的本質1msg.post(url, message_id, message)   Defold 引擎內建 用於 GO &#x2F; Component &#x2F; Script 之間溝通 強耦合（必須知道接收者 URL） 與場景（collection）生命週期綁定  msg 的設計目的 讓「引擎物件」彼此溝通而非用來承擔遊戲整體架構的協作責任   二、msg 的先天限制❌ 1. 必須明確指定接收者1msg...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相關推薦</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/12/28/defold-msg-vs-event/" title="msg vs event"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-28</div><div class="info-item-2">msg vs event</div></div><div class="info-2"><div class="info-item-1">為什麼 Defold 已經有了內建的消息系統 msg.post，實務中還使用了額外的 Event 系統？ 本文所指 “額外的 Event 系統”，是由 Insality 編寫的 defold-eventhttps://github.com/Insality/defold-event   以下討論皆基於此類「架構層事件系統」的設計思路，而非 Defold 引擎內建的 msg 機制。   一句話結論 msg 是 Defold 的「引擎級訊息系統」Event（如 defold-event）是「遊戲架構層的事件系統」 兩者並不重複，而是層級與責任不同。   一、什麼是 msg？msg 的本質1msg.post(url, message_id, message)   Defold 引擎內建 用於 GO &#x2F; Component &#x2F; Script 之間溝通 強耦合（必須知道接收者 URL） 與場景（collection）生命週期綁定  msg 的設計目的 讓「引擎物件」彼此溝通而非用來承擔遊戲整體架構的協作責任   二、msg 的先天限制❌ 1. 必須明確指定接收者1msg...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">sparkerlance</div><div class="author-info-description">lua and pixelart</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">標籤</div><div class="length-num">11</div></a><a href="/categories/"><div class="headline">分類</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/sparkerlance"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目錄</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Defold-%E6%8F%92%E4%BB%B6%E7%A0%94%E7%A9%B6-%E7%B3%BB%E5%88%97%E7%9B%AE%E9%8C%84"><span class="toc-number">1.</span> <span class="toc-text">Defold 插件研究 系列目錄</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A0%94%E7%A9%B6%E7%9B%AE%E7%9A%84"><span class="toc-number">1.1.</span> <span class="toc-text">研究目的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B0%A1%E4%BB%8B"><span class="toc-number">1.2.</span> <span class="toc-text">簡介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Defold"><span class="toc-number">1.2.1.</span> <span class="toc-text">Defold</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Insality"><span class="toc-number">1.2.2.</span> <span class="toc-text">Insality</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E5%88%97%E6%A6%82%E8%BF%B0"><span class="toc-number">1.3.</span> <span class="toc-text">系列概述</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%AE%E6%A8%99%E8%AE%80%E8%80%85"><span class="toc-number">1.3.1.</span> <span class="toc-text">目標讀者</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%A7%E5%AE%B9%E6%A6%82%E8%BF%B0"><span class="toc-number">1.3.2.</span> <span class="toc-text">內容概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AB%A0%E7%AF%80%E7%9B%AE%E6%A8%99"><span class="toc-number">1.3.3.</span> <span class="toc-text">章節目標</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8C%E6%88%90%E6%94%B6%E7%A9%AB"><span class="toc-number">1.3.4.</span> <span class="toc-text">完成收穫</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Insality-%E6%8F%92%E4%BB%B6%E4%B8%80%E8%A6%BD"><span class="toc-number">1.4.</span> <span class="toc-text">Insality 插件一覽</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%9C%E6%96%BCInsality%E6%8F%92%E4%BB%B6%E5%BB%BA%E8%AD%B0%E7%9A%84%E7%A0%94%E7%A9%B6%E9%A0%86%E5%BA%8F"><span class="toc-number">1.5.</span> <span class="toc-text">關於Insality插件建議的研究順序</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-Event%EF%BC%88%E8%B7%A8-Context-%E4%BA%8B%E4%BB%B6%E7%B3%BB%E7%B5%B1%EF%BC%89"><span class="toc-number">1.5.1.</span> <span class="toc-text">1. Event（跨 Context 事件系統）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-Decore%EF%BC%88ECS-%E6%A0%B8%E5%BF%83%EF%BC%89"><span class="toc-number">1.5.2.</span> <span class="toc-text">2. Decore（ECS 核心）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-Druid%EF%BC%88UI-%E6%A1%86%E6%9E%B6%EF%BC%89"><span class="toc-number">1.5.3.</span> <span class="toc-text">3. Druid（UI 框架）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-Panthera-2-0%EF%BC%88%E5%8B%95%E7%95%AB%E7%8B%80%E6%85%8B%E6%A9%9F%EF%BC%89"><span class="toc-number">1.5.4.</span> <span class="toc-text">4. Panthera 2.0（動畫狀態機）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-Saver%EF%BC%88%E5%AD%98%E6%AA%94%E7%B3%BB%E7%B5%B1%EF%BC%89"><span class="toc-number">1.5.5.</span> <span class="toc-text">5. Saver（存檔系統）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-Quest%EF%BC%88%E4%BB%BB%E5%8B%99%E7%B3%BB%E7%B5%B1%EF%BC%89"><span class="toc-number">1.5.6.</span> <span class="toc-text">6. Quest（任務系統）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-Detiled%EF%BC%88Tiled-%E2%86%92-ECS%EF%BC%89"><span class="toc-number">1.5.7.</span> <span class="toc-text">7. Detiled（Tiled → ECS）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8-Lang%EF%BC%88Defold-Localization-%E8%AA%9E%E8%A8%80%E6%8F%92%E4%BB%B6%EF%BC%89"><span class="toc-number">1.5.8.</span> <span class="toc-text">8. Lang（Defold Localization &#x2F; 語言插件）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%96%8B%E7%99%BC%E5%89%8D%E8%88%87%E9%9A%8E%E6%AE%B5%E6%80%A7%E7%A2%BA%E8%AA%8D%E4%BA%8B%E9%A0%85%EF%BC%88%E7%B3%BB%E5%88%97%E5%85%B1%E9%80%9A%EF%BC%89"><span class="toc-number">1.6.</span> <span class="toc-text">開發前與階段性確認事項（系列共通）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%96%8B%E7%99%BC%E5%89%8D%E7%A2%BA%E8%AA%8D%E4%BA%8B%E9%A0%85"><span class="toc-number">1.6.1.</span> <span class="toc-text">開發前確認事項</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9A%8E%E6%AE%B5%E6%80%A7%E7%A2%BA%E8%AA%8D%E4%BA%8B%E9%A0%85"><span class="toc-number">1.6.2.</span> <span class="toc-text">階段性確認事項</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%BA%E8%AD%B0%E7%B8%BD%E6%8E%A7-Repo"><span class="toc-number">1.7.</span> <span class="toc-text">建議總控 Repo</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E5%88%97%E8%A1%A8%E4%B8%8A%E5%AF%A6%E4%BD%9C%E5%BE%8C%EF%BC%8C%E5%B0%87%E5%BE%97%E5%88%B0%E4%BB%80%E9%BA%BC%EF%BC%9F"><span class="toc-number">1.8.</span> <span class="toc-text">完整列表上實作後，將得到什麼？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E8%83%BD%E5%8A%9B%E5%8C%85%E6%8B%AC%EF%BC%9A"><span class="toc-number">1.8.1.</span> <span class="toc-text">核心能力包括：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Presentation-%E5%B1%A4%EF%BC%88View-ViewController%EF%BC%89"><span class="toc-number">1.8.1.1.</span> <span class="toc-text">- Presentation 層（View &#x2F; ViewController）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#System-%E5%B1%A4"><span class="toc-number">1.8.1.2.</span> <span class="toc-text">- System 層</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Data-%E5%B1%A4%EF%BC%88Model%EF%BC%89"><span class="toc-number">1.8.1.3.</span> <span class="toc-text">- Data 層（Model）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Utility-%E5%B1%A4"><span class="toc-number">1.8.1.4.</span> <span class="toc-text">- Utility 層</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8B%E4%BB%B6%E8%88%87%E6%8C%87%E4%BB%A4%EF%BC%88Command-Event%EF%BC%89"><span class="toc-number">1.8.2.</span> <span class="toc-text">- 事件與指令（Command &#x2F; Event）</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/12/28/defold-insality-plugin-study-series-0/" title="defold plugin study series [0]">defold plugin study series [0]</a><time datetime="2025-12-28T06:30:00.000Z" title="發表於 2025-12-28 14:30:00">2025-12-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/12/28/defold-msg-vs-event/" title="msg vs event">msg vs event</a><time datetime="2025-12-28T04:43:41.000Z" title="發表於 2025-12-28 12:43:41">2025-12-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/12/26/update-vs-fixed-update/" title="update vs fixed update">update vs fixed update</a><time datetime="2025-12-26T09:54:47.000Z" title="發表於 2025-12-26 17:54:47">2025-12-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/12/02/dgd-0-defold-game-development-introduction/" title="讓我們一起用 Defold 來開發遊戲">讓我們一起用 Defold 來開發遊戲</a><time datetime="2025-12-02T14:25:40.000Z" title="發表於 2025-12-02 22:25:40">2025-12-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/11/11/hexo-fix-busuanzi/" title="修復 Hexo Butterfly 主題的 Busuanzi 訪客計數問題">修復 Hexo Butterfly 主題的 Busuanzi 訪客計數問題</a><time datetime="2025-11-11T12:30:00.000Z" title="發表於 2025-11-11 20:30:00">2025-11-11</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By sparkerlance</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主題 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="閱讀模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日夜模式切換"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="單欄和雙欄切換"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="設定"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目錄"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到頂端"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.2"></script><script src="/js/main.js?v=5.5.2"></script><div class="js-pjax"></div><script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><script async data-pjax src="/"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜尋</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  資料載入中</span></div><div class="local-search-input"><input placeholder="搜尋文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.2"></script></div></div></body></html>
