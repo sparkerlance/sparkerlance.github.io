@@ -4,6 +4,37 @@
   
     
     <entry>
+      <title>演算法生存指南 - 閱讀筆記（序章）</title>
+      <link href="/2026/01/06/reading-notes-algorithm-survival-0/"/>
+      <url>/2026/01/06/reading-notes-algorithm-survival-0/</url>
+      
+        <content type="html"><![CDATA[<blockquote><p>在這個AI便捷、查詢方便的年代，”做不到”的最多數原因是”沒想到”<br>辦法在認知之外</p></blockquote><h2 id="筆者簡介"><a href="#筆者簡介" class="headerlink" title="筆者簡介"></a>筆者簡介</h2><blockquote><p>這是《演算法生存指南》閱讀筆記的序章。</p></blockquote><p>我是 <strong>sparkerlance</strong>，一位興趣廣泛的軟體開發者。<br><br>筆名的直譯為 “火星長矛”或”探索者蘭斯”，也可以唸成”史塔克蘭斯”，有”天外飛來一筆”的意思。<br><br>最喜歡的事，是提升軟體的使用者體驗，並根據目標找出最適合的實現方法。  <br><br>我熱衷學習新事物，從 C#、Java、HTML&#x2F;CSS、GDScript、Rust、C++ 到 Lua。  <br><br>擁有6年 Unity 開發經驗<br><br>曾任職於VR遊戲公司，負責開發區域網路連機的配對模組、<br><br>適配不同廠家的手柄訊號通用模組的軟體開發。<br><br>目前主要使用 Lua，在 Defold 引擎上進行遊戲開發。</p><p>我超愛看書——每一本實體書都是作者的知識結晶，尤其偏好理論與實作結合的類型。<br>也超愛寫程式，代碼就像魔咒，充滿創造與秩序之美（在理想情況下～）。</p><blockquote><p>人之所以做得到一件事，是因為這件事的解決方法在認知範圍內；<br>人做不到一件事時，往往是因為不知道某種可行的方式，或缺乏評估這件事的能力，而無從著手。<br>—— sparkerlance</p></blockquote><p>以玩家角度來描述&gt;&gt;<br>“理解”等於讓任務”亮血條”，只要”亮血條”那就好辦了。</p><p>這本由深智數位發行的《演算法生存指南》(這是一本實體書)<br>我一翻開目錄，就愛上了它條理分明的結構。<br>我希望我不僅是讀過，而是能真正應用在我的軟體開發實務上。<br>因此，我撰寫這個「演算法生存指南閱讀筆記」系列：<br>一章一章從歸納到演繹，原書範例使用 C++，我會全部用 <strong>Lua</strong> 重新實作，<br>嘗試將書中內容理解後，使我的代碼和思考模式更 <strong>lean and clean</strong>。</p><h2 id="筆者閱讀動機"><a href="#筆者閱讀動機" class="headerlink" title="筆者閱讀動機"></a>筆者閱讀動機</h2><blockquote><p><strong>當某個概念真正進入我的理解範圍，我才有辦法靈活運用它。</strong><br>人只能想到自己認知範圍內的事物，<br>擴展認知，就等於擴大創造的可能性。</p></blockquote><h2 id="筆者的閱讀方式"><a href="#筆者的閱讀方式" class="headerlink" title="筆者的閱讀方式"></a>筆者的閱讀方式</h2><ul><li>依照章節順序完整閱讀</li><li>每章結束後進行重點總結，追求「真正理解」而非「只是讀過」</li><li>每章都會用 <strong>Lua</strong> 實作核心概念</li><li>實作目標：以「能重現想法」為最低標準，同時力求簡潔優雅</li></ul><h2 id="閱讀書籍簡介"><a href="#閱讀書籍簡介" class="headerlink" title="閱讀書籍簡介"></a>閱讀書籍簡介</h2><p>《演算法生存指南》是一本<strong>實用導向</strong>的演算法書籍，精心挑選實務與考試中最常出現的主題，並搭配完整程式碼幫助理解。</p><p>《演算法生存指南》主要使用 <strong>C++</strong> 作為實作語言，每章後附有 LeetCode &#x2F; APCS 等實戰題目，非常適合：</p><ul><li>資料結構與演算法的入門與複習</li><li>程式競賽與考試準備</li><li>面試前的系統性整理</li></ul><h2 id="《演算法生存指南》的作者與編者"><a href="#《演算法生存指南》的作者與編者" class="headerlink" title="《演算法生存指南》的作者與編者"></a>《演算法生存指南》的作者與編者</h2><h3 id="《演算法生存指南》作者"><a href="#《演算法生存指南》作者" class="headerlink" title="《演算法生存指南》作者"></a>《演算法生存指南》作者</h3><p><strong>李耕銘</strong><br>電機所畢業，目前於台大資工訓練班擔任講師。</p><h3 id="《演算法生存指南》編者"><a href="#《演算法生存指南》編者" class="headerlink" title="《演算法生存指南》編者"></a>《演算法生存指南》編者</h3><p><strong>張凱鈞</strong><br>原為商業顧問，後轉往自然語言處理領域研究。</p><h2 id="《演算法生存指南》的章節目錄"><a href="#《演算法生存指南》的章節目錄" class="headerlink" title="《演算法生存指南》的章節目錄"></a>《演算法生存指南》的章節目錄</h2><p><strong>01 資料結構與演算法入門</strong><br>1-1 資料結構與演算法簡介<br>1-2 效能還與哪些因素有關<br>1-3 Take Home Message  </p><p><strong>02 複雜度估算 Complexity</strong><br>2-1 複雜度簡介<br>2-2 複雜度的估計法<br>2-3 Big-O 的運算證明<br>2-4 極限的表達方式<br>2-5 複雜度的其他符號<br>2-6 遞迴的複雜度計算  </p><p><strong>03 P 與 NP 問題</strong><br>3-1 演算法問題的分類<br>3-2 問題的難度<br>3-3 歸約與 NP-hard<br>3-4 NP-complete（NPC）  </p><p><strong>04 排序 Sort</strong><br>4-1 排序簡介<br>4-2 插入排序法 Insertion Sort<br>4-3 謝爾排序法 Shell Sort<br>4-4 選擇排序法 Selection Sort<br>4-5 冒泡排序法 Bubble Sort<br>4-6 合併排序法 Merge Sort<br>4-7 堆積排序法 Heap Sort<br>4-8 快速排序法 Quick Sort<br>4-9 C++ STL 中的排序<br>4-10 實戰練習<br>4-11 (補充) C++ STL 的內觀排序法  </p><p><strong>05 搜尋 Search</strong><br>5-1 搜尋簡介<br>5-2 循序搜尋<br>5-3 二分搜尋法<br>5-4 插補搜尋<br>5-5 黃金切割搜尋<br>5-6 費氏搜尋<br>5-7 雜湊搜尋<br>5-8 搜尋總結<br>5-9 實戰練習  </p><p><strong>06 分治法 Divide and Conquer</strong><br>6-1 分治法簡介<br>6-2 河內塔<br>6-3 合併排序與快速排序<br>6-4 最大子數列問題<br>6-5 矩陣相乘<br>6-6 選擇問題<br>6-7 支配理論<br>6-8 實戰練習  </p><p><strong>07 貪婪演算法 Greedy Algorithm</strong><br>7-1 貪婪演算法簡介<br>7-2 找錢問題<br>7-3 中途休息<br>7-4 活動選擇問題<br>7-5 背包問題 Knapsack Problem<br>7-6 工作排程<br>7-7 實戰練習  </p><p><strong>08 動態規劃 Dynamic Programming</strong><br>8-1 動態規劃簡介<br>8-2 動態規劃解析<br>8-3 找錢問題<br>8-4 最大子數列<br>8-5 活動選擇問題<br>8-6 郵票問題<br>8-7 木頭切割問題<br>8-8 背包問題<br>8-9 矩陣鏈乘<br>8-10 最長遞增子序列 (LIS)<br>8-11 最長共同子序列 (LCS)<br>8-12 實戰練習<br>8-13 小結  </p><p><strong>09 圖論 Graph</strong><br>9-1 「圖」的定義<br>9-2 圖的表示方式<br>9-3 圖的分類<br>9-4 AOV 網路、AOE 網路與拓樸排序<br>9-5 實戰練習  </p><p><strong>10 廣度優先搜尋 Breadth-First Search</strong><br>10-1 圖的搜尋<br>10-2 廣度優先搜尋的實作<br>10-3 計算連通元件個數<br>10-4 窮舉所有情形<br>10-5 最短路徑<br>10-6 環的判別<br>10-7 實戰練習  </p><p><strong>11 深度優先搜尋 Depth-First Search</strong><br>11-1 深度優先搜尋簡介與實作<br>11-2 拓樸排序<br>11-3 強連通元件<br>11-4 N 皇后問題<br>11-5 實戰練習  </p><p><strong>12 最小生成樹 Minimal Spanning Tree</strong><br>12-1 最小生成樹定義與原理<br>12-2 集合的搜尋與合併<br>12-3 Kruskal 演算法<br>12-4 Prim 演算法  </p><p><strong>13 網路流 Flow Network</strong><br>13-1 網路流問題簡介<br>13-2 網路流問題的演算法<br>13-3 Ford-Fulkerson 方法<br>13-4 Edmonds-Karp Algorithm<br>13-5 二分圖最大匹配  </p><p><strong>14 最短路徑 Shortest Path</strong><br>14-1 最短路徑問題簡介<br>14-2 Bellman-Ford Algorithm<br>14-3 SPFA (Shortest Path Faster Algorithm)<br>14-4 DAG Algorithm<br>14-5 Dijkstra’s Algorithm<br>14-6 Floyd-Warshall Algorithm<br>14-7 最短路徑問題總結</p><hr>]]></content>
+      
+      
+      <categories>
+          
+          <category> 閱讀筆記 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Lua </tag>
+            
+            <tag> 演算法 </tag>
+            
+            <tag> 資料結構 </tag>
+            
+            <tag> 讀書計畫 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>defold plugin study series [0]</title>
       <link href="/2025/12/28/defold-insality-plugin-study-series-0/"/>
       <url>/2025/12/28/defold-insality-plugin-study-series-0/</url>
