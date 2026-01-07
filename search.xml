@@ -4,6 +4,29 @@
   
     
     <entry>
+      <title>what_is_api</title>
+      <link href="/2026/01/07/what-is-api/"/>
+      <url>/2026/01/07/what-is-api/</url>
+      
+        <content type="html"><![CDATA[<h1 id="什麼是-API？"><a href="#什麼是-API？" class="headerlink" title="什麼是 API？"></a>什麼是 API？</h1><p>簡單來說，API 像是「語法」。<pre><br>不只是在前後端之間，任何套件或框架，只要要給別人使用，都一定會有 API。<br>前端與後端溝通時，後端通常會提供一份 API 使用說明，告訴前端在什麼情況下該呼叫哪一個 API，以及會回傳哪些資料。<br>在遊戲公司時，像是排行榜系統，前端只要呼叫對應的 API，後端就會回傳玩家的通關時間、排名、人數，或是累積遊玩時間等資料；<br>又或者在遊戲啟動時，前端會呼叫「啟動驗證」的 API，只要驗證通過，後端就會回傳可以進入遊戲的結果。<br>前端不需要知道後端怎麼計算排名、怎麼驗證帳號，<br>只要依照 API 的規則呼叫，就能拿到對應的結果。<br>同樣的概念，也會出現在使用各種套件或框架、遊戲影擎時。</pre></p><p>舉例來說，當我在學習 ECS（Entity Component System）時，在專案裡看到了一個檔案：</p><p>[API.md]</p><p>沒有使用過套件或框架的開發者會冒出一個疑問：</p><ul><li>什麼是 API？</li></ul><h3 id="一、API-的白話文解釋"><a href="#一、API-的白話文解釋" class="headerlink" title="一、API 的白話文解釋"></a>一、API 的白話文解釋</h3><p><strong>API &#x3D;「我可以怎麼用這個東西」</strong></p><p>API（Application Programming Interface）<br>簡單來說就是：<br>「這個程式／套件提供了哪些功能？我要怎麼呼叫它？」</p><p>你可以把 API 想成一個<strong>函式列表</strong>。<br>正確的呼叫，就會給你預期的結果。</p><h4 id="用生活例子比喻"><a href="#用生活例子比喻" class="headerlink" title="用生活例子比喻"></a>用生活例子比喻</h4><p>想像你有一台飲料機：</p><ul><li>按鈕 A：可樂  </li><li>按鈕 B：紅茶  </li><li>按鈕 C：綠茶</li></ul><p>你不需要知道飲料機裡面怎麼運作<br>你只需要知道：</p><ul><li>按哪個按鈕  </li><li>會得到什麼結果</li></ul><blockquote><p>這些「按鈕」就是 API</p></blockquote><h3 id="二、在程式世界裡-API-是什麼？"><a href="#二、在程式世界裡-API-是什麼？" class="headerlink" title="二、在程式世界裡 API 是什麼？"></a>二、在程式世界裡 API 是什麼？</h3><p>在程式中，API 通常是：</p><ul><li>函式（function）  </li><li>模組（module）  </li><li>方法（method）  </li><li>可以呼叫的介面</li></ul><p>舉一個簡單 Lua 例子</p><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ecs.create_entity()</span><br><span class="line">ecs.add_component(entity, position)</span><br><span class="line">ecs.remove_entity(entity)</span><br></pre></td></tr></table></figure><p>這些就是 ECS 套件提供的 API<br>你只要知道：</p><p>有哪些函式<br>要傳什麼參數<br>會回傳什麼</p><p>不用知道 ECS 內部怎麼實作。</p><h3 id="三、為什麼-ECS-套件一定會有-API？"><a href="#三、為什麼-ECS-套件一定會有-API？" class="headerlink" title="三、為什麼 ECS 套件一定會有 API？"></a>三、為什麼 ECS 套件一定會有 API？</h3><p>ECS 本身是一種「架構思想」，但實際使用時：</p><p>每個 ECS 套件實作方式不同<br>每個套件提供的功能也不同</p><p>所以作者一定要告訴你：<br>「我這個 ECS，你可以這樣用」<br>這就是 API 文件 的用途。</p><h3 id="四、API-md-是什麼？"><a href="#四、API-md-是什麼？" class="headerlink" title="四、API.md 是什麼？"></a>四、API.md 是什麼？</h3><p>API.md &#x3D; API 說明文件<br>當你在插件（例如你看到的 decore）裡看到：<br>textAPI.md<br>通常代表：</p><p>這不是教你 ECS 理論<br>而是告訴你「有哪些函式可以用」</p><p>內容通常會像這樣：<br>text## ecs.create_entity()<br>建立一個新的 entity</p><h4 id="Returns"><a href="#Returns" class="headerlink" title="Returns"></a>Returns</h4><p>entity id<br>這就是 API 文件的典型格式。</p><h3 id="五、API-跟教學（Tutorial）的差別"><a href="#五、API-跟教學（Tutorial）的差別" class="headerlink" title="五、API 跟教學（Tutorial）的差別"></a>五、API 跟教學（Tutorial）的差別</h3><p>這是很多新手最容易混淆的地方。</p><h4 id="教學（Tutorial）"><a href="#教學（Tutorial）" class="headerlink" title="教學（Tutorial）"></a>教學（Tutorial）</h4><blockquote><p>原理+範例<br>告訴你「為什麼要這樣做」<br>有流程、有例子<br>適合初學概念  </p></blockquote><h4 id="API-文件（API-md）"><a href="#API-文件（API-md）" class="headerlink" title="API 文件（API.md）"></a>API 文件（API.md）</h4><blockquote><p>使用說明書<br>告訴你「你可以呼叫什麼」<br>API 是查資料用的，像是「如何使用的字典」</p></blockquote><h2 id="六、哪時-去看-API"><a href="#六、哪時-去看-API" class="headerlink" title="六、哪時 去看 API"></a>六、哪時 去看 API</h2><p>學新框架時，通常的流程是：</p><ol><li><p><strong>先懂概念</strong></p><ul><li>Entity 是什麼</li><li>Component 是什麼</li><li>System 在做什麼</li></ul></li><li><p><strong>再來才是看 API</strong></p><ul><li>entity 要怎麼建立？</li><li>component 要怎麼加？</li><li>system 要怎麼註冊？</li></ul></li></ol><hr><h2 id="七、應該怎麼看-API-md？"><a href="#七、應該怎麼看-API-md？" class="headerlink" title="七、應該怎麼看 API.md？"></a>七、應該怎麼看 API.md？</h2><p>學「新框架」的建議：</p><h3 id="第一次看"><a href="#第一次看" class="headerlink" title="第一次看"></a>第一次看</h3><p>不用全懂，只要知道：</p><ul><li>有哪些主要功能</li><li>大概能做什麼</li></ul><h3 id="實作時"><a href="#實作時" class="headerlink" title="實作時"></a>實作時</h3><p>當你想做某件事時，例如：</p><ul><li>「我要幫 entity 加 component」</li></ul><blockquote><p>再回來查 API.md<br>找相關函式</p></blockquote><hr><h2 id="八、簡短總結"><a href="#八、簡短總結" class="headerlink" title="八、簡短總結"></a>八、簡短總結</h2><p>一句話記住 API 是什麼：</p><blockquote><p>API 是一組「對外公開、如何使用的函式與介面」<br><br>而 API.md 是在說明這些函式怎麼用的文件</p></blockquote><hr>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> API </tag>
+            
+            <tag> Beginner Guide </tag>
+            
+            <tag> Programming Basics </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>演算法生存指南 - 閱讀筆記（序章）</title>
       <link href="/2026/01/06/reading-notes-algorithm-survival-0/"/>
       <url>/2026/01/06/reading-notes-algorithm-survival-0/</url>
