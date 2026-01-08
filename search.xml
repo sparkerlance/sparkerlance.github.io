@@ -4,7 +4,38 @@
   
     
     <entry>
-      <title>what_is_api</title>
+      <title>從 Overwatch 學 ECS</title>
+      <link href="/2026/01/08/%E5%BE%9E-Overwatch-%E5%AD%B8-ECS/"/>
+      <url>/2026/01/08/%E5%BE%9E-Overwatch-%E5%AD%B8-ECS/</url>
+      
+        <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>如果要學習一種系統設計方法，不能只是看理論，一定要去研究已在大規模實戰中驗證過的案例。 </p><p>ECS（Entity Component System） 正是這類設計模式之一，而 Overwatch（守望先鋒／鬥陣特攻） 則是其成功應用於高併發即時遊戲的代表。</p><p>在數百萬玩家同時在線、長期營運與頻繁更新的條件下，仍能維持效能、穩定性與可擴充性，使它成為研究大型 ECS 與資料導向設計時非常值得參考的實例。</p><hr><h2 id="為什麼選擇-Overwatch-作為研究對象？"><a href="#為什麼選擇-Overwatch-作為研究對象？" class="headerlink" title="為什麼選擇 Overwatch 作為研究對象？"></a>為什麼選擇 Overwatch 作為研究對象？</h2><ul><li>高併發即時對戰</li><li>長期營運、系統可持續演進</li><li>高度模組化的能力與武器系統</li><li>成熟的網路同步與回放機制</li></ul><p>非常感謝暴雪在 GDC 公開了大量系統設計概念與實作細節片段。</p><hr><h2 id="相關-GDC-演講資源整理"><a href="#相關-GDC-演講資源整理" class="headerlink" title="相關 GDC 演講資源整理"></a>相關 GDC 演講資源整理</h2><p>（影片皆為英文，需具備基本英文聽力）</p><h3 id="1-Overwatch-Gameplay-Architecture-and-Netcode"><a href="#1-Overwatch-Gameplay-Architecture-and-Netcode" class="headerlink" title="1. Overwatch Gameplay Architecture and Netcode"></a>1. Overwatch Gameplay Architecture and Netcode</h3><p><a href="https://www.youtube.com/watch?v=W3aieHjyNvw&t">https://www.youtube.com/watch?v=W3aieHjyNvw&amp;t</a></p><blockquote><p>研究 ECS 架構與整體遊戲系統設計的核心影片。</p></blockquote><hr><h3 id="2-GDC-Networking-Scripted-Weapons-and-Abilities-in-‘Overwatch’"><a href="#2-GDC-Networking-Scripted-Weapons-and-Abilities-in-‘Overwatch’" class="headerlink" title="2. GDC Networking Scripted Weapons and Abilities in ‘Overwatch’"></a>2. GDC Networking Scripted Weapons and Abilities in ‘Overwatch’</h3><p><a href="https://www.youtube.com/watch?v=odSBJ49rzDo">https://www.youtube.com/watch?v=odSBJ49rzDo</a></p><blockquote><p>對線上遊戲的技能、武器與網路架構非常有參考價值。</p></blockquote><hr><h3 id="3-GDC-Replay-Technology-in-‘Overwatch’-–-Kill-Cam-Gameplay-and-Highlights"><a href="#3-GDC-Replay-Technology-in-‘Overwatch’-–-Kill-Cam-Gameplay-and-Highlights" class="headerlink" title="3. GDC Replay Technology in ‘Overwatch’ – Kill Cam, Gameplay, and Highlights"></a>3. GDC Replay Technology in ‘Overwatch’ – Kill Cam, Gameplay, and Highlights</h3><p><a href="https://www.youtube.com/watch?v=A5KW5d15J7I">https://www.youtube.com/watch?v=A5KW5d15J7I</a></p><blockquote><p>說明回放系統、擊殺鏡頭與高光時刻的實作方式。</p></blockquote><hr><h2 id="我的學習方式"><a href="#我的學習方式" class="headerlink" title="我的學習方式"></a>我的學習方式</h2><p>這類經典演講，我通常會：</p><ol><li><strong>慢速反覆回看</strong></li><li>使用 Google LLM 將逐字稿整理成摘要</li><li>畫出系統互動關係圖與時序圖</li><li>釐清各系統的責任邊界  <ul><li>該系統「負責什麼」</li><li>不該做什麼</li><li>系統之間如何溝通</li></ul></li></ol><p>就像高考看完範文，最後還是得自己動筆寫作文一樣。</p><hr><h2 id="實作環境與心得"><a href="#實作環境與心得" class="headerlink" title="實作環境與心得"></a>實作環境與心得</h2><p>我的實作方式是：</p><ul><li><strong>ECS</strong>：Lua ECS library <a href="https://github.com/Insality/decore"><code>decore</code></a></li><li><strong>遊戲引擎</strong>：Defold</li><li><strong>語言</strong>：Lua</li></ul><p>親手實作，把抽象概念轉化為自己的理解。</p><p>在反覆的測試、修改與重構過程中，逐步熟悉 ECS 的實際落地方式。</p><hr><h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>這些參考這些資源非常推薦給：</p><ul><li>對 <strong>ECS（Entity Component System）</strong> 有興趣的工程師</li><li>想研究 <strong>線上遊戲 &#x2F; 即時遊戲架構</strong></li><li>關心 <strong>資料導向設計（Data-Oriented Design）</strong></li><li>對 Overwatch 技術實作有興趣的人</li></ul><p>之後如果有 ECS 實作細節，也會再記錄成後續筆記。</p><hr>]]></content>
+      
+      
+      <categories>
+          
+          <category> Game Development </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> ECS </tag>
+            
+            <tag> Game Architecture </tag>
+            
+            <tag> Overwatch </tag>
+            
+            <tag> Data-Oriented Design </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>什麼是 API？</title>
       <link href="/2026/01/07/what-is-api/"/>
       <url>/2026/01/07/what-is-api/</url>
       
