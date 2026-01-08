@@ -1,0 +1,259 @@
+<!DOCTYPE html><html lang="zh-TW" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>ECS 專案分析：Cosmic Dash (1)：依賴篇 | SparkerLance Blog</title><meta name="author" content="sparkerlance"><meta name="copyright" content="sparkerlance"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="從依賴關係 (Dependencies) 切入，分析 Cosmic Dash 的軟體架構">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ECS 專案分析：Cosmic Dash (1)：依賴篇">
+<meta property="og:url" content="https://sparkerlance.github.io/2026/01/08/ECS-%E5%B0%88%E6%A1%88%E5%88%86%E6%9E%90%EF%BC%9ACosmic-Dash-1-%EF%BC%9A%E4%BE%9D%E8%B3%B4%E7%AF%87/index.html">
+<meta property="og:site_name" content="SparkerLance Blog">
+<meta property="og:description" content="從依賴關係 (Dependencies) 切入，分析 Cosmic Dash 的軟體架構">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://sparkerlance.github.io/img/icon.png">
+<meta property="article:published_time" content="2026-01-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-08T16:56:22.000Z">
+<meta property="article:author" content="sparkerlance">
+<meta property="article:tag" content="Defold">
+<meta property="article:tag" content="ECS">
+<meta property="article:tag" content="Game Development">
+<meta property="article:tag" content="Project Analysis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sparkerlance.github.io/img/icon.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "ECS 專案分析：Cosmic Dash (1)：依賴篇",
+  "url": "https://sparkerlance.github.io/2026/01/08/ECS-%E5%B0%88%E6%A1%88%E5%88%86%E6%9E%90%EF%BC%9ACosmic-Dash-1-%EF%BC%9A%E4%BE%9D%E8%B3%B4%E7%AF%87/",
+  "image": "https://sparkerlance.github.io/img/icon.png",
+  "datePublished": "2026-01-07T16:00:00.000Z",
+  "dateModified": "2026-01-08T16:56:22.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "sparkerlance",
+      "url": "https://sparkerlance.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://sparkerlance.github.io/2026/01/08/ECS-%E5%B0%88%E6%A1%88%E5%88%86%E6%9E%90%EF%BC%9ACosmic-Dash-1-%EF%BC%9A%E4%BE%9D%E8%B3%B4%E7%AF%87/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.2"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"找不到符合您查詢的內容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '複製成功',
+    error: '複製失敗',
+    noSupport: '瀏覽器不支援'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '剛剛',
+    min: '分鐘前',
+    hour: '小時前',
+    day: '天前',
+    month: '個月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: '載入更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'ECS 專案分析：Cosmic Dash (1)：依賴篇',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">SparkerLance Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">ECS 專案分析：Cosmic Dash (1)：依賴篇</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首頁</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜尋</span></span></div></div></nav><div id="post-info"><h1 class="post-title">ECS 專案分析：Cosmic Dash (1)：依賴篇</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">發表於</span><time class="post-meta-date-created" datetime="2026-01-07T16:00:00.000Z" title="發表於 2026-01-08 00:00:00">2026-01-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新於</span><time class="post-meta-date-updated" datetime="2026-01-08T16:56:22.000Z" title="更新於 2026-01-09 00:56:22">2026-01-09</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Project-Analysis/">Project Analysis</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">瀏覽量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="ECS-專案分析：Cosmic-Dash-1-：依賴篇"><a href="#ECS-專案分析：Cosmic-Dash-1-：依賴篇" class="headerlink" title="ECS 專案分析：Cosmic Dash (1)：依賴篇"></a>ECS 專案分析：Cosmic Dash (1)：依賴篇</h2><h3 id="0-下載或Clone專案"><a href="#0-下載或Clone專案" class="headerlink" title="0. 下載或Clone專案"></a>0. 下載或Clone專案</h3><p>Cosmic Dash : <a target="_blank" rel="noopener" href="https://github.com/Insality/cosmic-dash-jam-2025">https://github.com/Insality/cosmic-dash-jam-2025</a><br>下載後使用 Defold 打開專案並資料夾選擇 <code>game.project</code>。<br>這裡我選擇使用 Fork 這個軟體來做版本管理，所以我的操作是：</p>
+<ol>
+<li>複製 GitHub URL  </li>
+<li>File &gt; Clone  </li>
+<li>選擇路徑，例如 <code>D://Defold/</code></li>
+</ol>
+<p>成功下載後，你會在 <code>D://Defold/</code> 看到名為 <code>cosmic-dash-jam-2025</code> 的資料夾。</p>
+<h3 id="1-查看-game-project-中的專案設定-Project"><a href="#1-查看-game-project-中的專案設定-Project" class="headerlink" title="1. 查看 game.project 中的專案設定 (Project)"></a>1. 查看 game.project 中的專案設定 (Project)</h3><ol>
+<li>使用 Defold 開啟專案後，左側會有一個 <strong>Assets</strong> 視窗。  </li>
+<li>在 <strong>Assets</strong> 視窗中向下捲動，找到綠色圖示的 <code>game.project</code> 檔案。  </li>
+<li>雙擊 <code>game.project</code> 開啟它。  </li>
+<li>點擊”中上視窗”左側的 <strong>Project</strong> 分頁，即可看到專案設定 general project settings。</li>
+</ol>
+<h4 id="Dependencies（專案依賴的外部庫）"><a href="#Dependencies（專案依賴的外部庫）" class="headerlink" title="Dependencies（專案依賴的外部庫）"></a>Dependencies（專案依賴的外部庫）</h4><p>Cosmic Dash 專案使用了以下外部插件：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/subsoap/defos/archive/refs/tags/v2.7.1.zip">https://github.com/subsoap/defos/archive/refs/tags/v2.7.1.zip</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/AGulev/drawpixels/archive/refs/tags/2.0.3.zip">https://github.com/AGulev/drawpixels/archive/refs/tags/2.0.3.zip</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Insality/panthera/archive/refs/tags/runtime.5.zip">https://github.com/Insality/panthera/archive/refs/tags/runtime.5.zip</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Insality/defold-tweener/archive/refs/heads/develop.zip">https://github.com/Insality/defold-tweener/archive/refs/heads/develop.zip</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Insality/defold-saver/archive/refs/heads/develop.zip">https://github.com/Insality/defold-saver/archive/refs/heads/develop.zip</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Insality/defold-lang/archive/refs/heads/develop.zip">https://github.com/Insality/defold-lang/archive/refs/heads/develop.zip</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Insality/defold-log/archive/refs/tags/6.zip">https://github.com/Insality/defold-log/archive/refs/tags/6.zip</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Insality/defold-event/archive/refs/tags/13.zip">https://github.com/Insality/defold-event/archive/refs/tags/13.zip</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Insality/druid/archive/refs/heads/develop.zip">https://github.com/Insality/druid/archive/refs/heads/develop.zip</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Insality/asset-store/archive/refs/tags/1.zip">https://github.com/Insality/asset-store/archive/refs/tags/1.zip</a></li>
+</ul>
+<h4 id="Custom-Resources（自訂資源路徑）"><a href="#Custom-Resources（自訂資源路徑）" class="headerlink" title="Custom Resources（自訂資源路徑）"></a>Custom Resources（自訂資源路徑）</h4><p>專案中指定的自訂資源資料夾：</p>
+<blockquote>
+<p>&#x2F;locales,&#x2F;tiled&#x2F;export</p>
+</blockquote>
+<ul>
+<li>這行欄位中使用逗號 <code>,</code> 分隔多個資料夾  </li>
+<li><code>/locales</code> 包含多語系 JSON  </li>
+<li><code>/tiled/export</code> 包含 Tiled 地圖 JSON</li>
+</ul>
+<h3 id="2-查看-game-project-中的專案入口-Bootstrap"><a href="#2-查看-game-project-中的專案入口-Bootstrap" class="headerlink" title="2. 查看 game.project 中的專案入口 (Bootstrap)"></a>2. 查看 game.project 中的專案入口 (Bootstrap)</h3><ul>
+<li><strong>Main Collection</strong>：<code>/loader.collection</code> → 專案啟動時會載入的起始場景</li>
+<li><strong>Render</strong>：<code>/builtins/render/default.render</code> → 預設渲染設定（包含相機、解析度等）</li>
+</ul>
+<h3 id="3-分析入口檔案：loader-collection"><a href="#3-分析入口檔案：loader-collection" class="headerlink" title="3. 分析入口檔案：loader.collection"></a>3. 分析入口檔案：loader.collection</h3><p>開啟 <code>/loader.collection</code>，可以看到它附加了 <code>loader.script</code> 腳本。</p>
+<p>點擊 <code>loader.script</code>，內容如下：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> <span class="built_in">log</span> = <span class="built_in">require</span>(<span class="string">&quot;log.log&quot;</span>)</span><br><span class="line"><span class="keyword">local</span> lang = <span class="built_in">require</span>(<span class="string">&quot;lang.lang&quot;</span>)</span><br><span class="line"><span class="keyword">local</span> druid = <span class="built_in">require</span>(<span class="string">&quot;druid.druid&quot;</span>)</span><br><span class="line"><span class="keyword">local</span> color = <span class="built_in">require</span>(<span class="string">&quot;druid.color&quot;</span>)</span><br><span class="line"><span class="keyword">local</span> saver = <span class="built_in">require</span>(<span class="string">&quot;saver.saver&quot;</span>)</span><br><span class="line"><span class="keyword">local</span> event = <span class="built_in">require</span>(<span class="string">&quot;event.event&quot;</span>)</span><br><span class="line"><span class="keyword">local</span> levels = <span class="built_in">require</span>(<span class="string">&quot;game.levels&quot;</span>)</span><br><span class="line"><span class="keyword">local</span> events = <span class="built_in">require</span>(<span class="string">&quot;event.events&quot;</span>)</span><br><span class="line"><span class="keyword">local</span> decore = <span class="built_in">require</span>(<span class="string">&quot;decore.decore&quot;</span>)</span><br><span class="line"><span class="keyword">local</span> detiled = <span class="built_in">require</span>(<span class="string">&quot;detiled.detiled&quot;</span>)</span><br><span class="line"><span class="keyword">local</span> panthera = <span class="built_in">require</span>(<span class="string">&quot;panthera.panthera&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">---@class scripts.loader</span></span><br><span class="line"></span><br><span class="line"><span class="comment">---@param self scripts.loader</span></span><br><span class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">init_random</span><span class="params">(self)</span></span></span><br><span class="line">	<span class="built_in">math</span>.<span class="built_in">randomseed</span>(socket.gettime())</span><br><span class="line">	<span class="built_in">math</span>.<span class="built_in">random</span>()</span><br><span class="line">	<span class="built_in">math</span>.<span class="built_in">random</span>()</span><br><span class="line">	<span class="built_in">math</span>.<span class="built_in">random</span>()</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">---@param self scripts.loader</span></span><br><span class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">init_logger</span><span class="params">(self)</span></span></span><br><span class="line">	lang.set_logger(<span class="built_in">log</span>.get_logger(<span class="string">&quot;lang&quot;</span>))</span><br><span class="line">	event.set_logger(<span class="built_in">log</span>.get_logger(<span class="string">&quot;event&quot;</span>))</span><br><span class="line">	saver.set_logger(<span class="built_in">log</span>.get_logger(<span class="string">&quot;saver&quot;</span>))</span><br><span class="line">	decore.set_logger(<span class="built_in">log</span>.get_logger(<span class="string">&quot;decore&quot;</span>))</span><br><span class="line">	detiled.set_logger(<span class="built_in">log</span>.get_logger(<span class="string">&quot;detiled&quot;</span>))</span><br><span class="line">	panthera.set_logger(<span class="built_in">log</span>.get_logger(<span class="string">&quot;panthera&quot;</span>))</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">---@param self scripts.loader</span></span><br><span class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">init_druid</span><span class="params">(self)</span></span></span><br><span class="line">	druid.set_text_function(lang.txp)</span><br><span class="line">	druid.set_default_style(<span class="built_in">require</span>(<span class="string">&quot;game.druid_style&quot;</span>))</span><br><span class="line">	color.add_palette(<span class="built_in">require</span>(<span class="string">&quot;game.palette&quot;</span>))</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">---@param self scripts.loader</span></span><br><span class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">init_window_listener</span><span class="params">(self)</span></span></span><br><span class="line">	window.set_listener(<span class="function"><span class="keyword">function</span><span class="params">(_, window_event)</span></span></span><br><span class="line">		druid.on_window_callback(window_event)</span><br><span class="line">		events.trigger(<span class="string">&quot;decore.window_event&quot;</span>, window_event)</span><br><span class="line">	<span class="keyword">end</span>)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">---@param self scripts.loader</span></span><br><span class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">init_saver</span><span class="params">(self)</span></span></span><br><span class="line">	<span class="comment">---@class saver.game_state</span></span><br><span class="line">	<span class="comment">---@field lang lang.state</span></span><br><span class="line">	<span class="comment">---@field level game.level.state</span></span><br><span class="line"></span><br><span class="line">	saver.init()</span><br><span class="line">	saver.bind_save_state(<span class="string">&quot;lang&quot;</span>, lang.state)</span><br><span class="line">	saver.bind_save_state(<span class="string">&quot;level&quot;</span>, levels.state)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">---@param self scripts.loader</span></span><br><span class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">init_lang</span><span class="params">(self)</span></span></span><br><span class="line">	lang.init(&#123;</span><br><span class="line">		&#123; id = <span class="string">&quot;en&quot;</span>, <span class="built_in">path</span> = <span class="string">&quot;/locales/en.json&quot;</span> &#125;,</span><br><span class="line">		<span class="comment">-- &#123; id = &quot;ru&quot;, path = &quot;/locales/ru.json&quot; &#125;,</span></span><br><span class="line">		<span class="comment">-- &#123; id = &quot;lt&quot;, path = &quot;/locales/lt.json&quot; &#125;,</span></span><br><span class="line">		<span class="comment">-- &#123; id = &quot;fr&quot;, path = &quot;/locales/fr.json&quot; &#125;,</span></span><br><span class="line">		<span class="comment">-- &#123; id = &quot;es&quot;, path = &quot;/locales/es.json&quot; &#125;,</span></span><br><span class="line">		<span class="comment">-- &#123; id = &quot;it&quot;, path = &quot;/locales/it.json&quot; &#125;,</span></span><br><span class="line">		<span class="comment">-- &#123; id = &quot;de&quot;, path = &quot;/locales/de.json&quot; &#125;,</span></span><br><span class="line">		&#123; id = <span class="string">&quot;tw&quot;</span>, <span class="built_in">path</span> = <span class="string">&quot;/locales/tw.json&quot;</span> &#125;,</span><br><span class="line">	&#125;)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">init_detiled</span><span class="params">(self)</span></span></span><br><span class="line">	detiled.load_tileset(<span class="string">&quot;/tiled/export/game.json&quot;</span>)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">---@param self scripts.loader</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">init</span><span class="params">(self)</span></span></span><br><span class="line">	init_random(<span class="built_in">self</span>)</span><br><span class="line">	init_logger(<span class="built_in">self</span>)</span><br><span class="line">	init_druid(<span class="built_in">self</span>)</span><br><span class="line">	init_window_listener(<span class="built_in">self</span>)</span><br><span class="line">	init_saver(<span class="built_in">self</span>)</span><br><span class="line">	init_lang(<span class="built_in">self</span>)</span><br><span class="line">	init_detiled(<span class="built_in">self</span>)</span><br><span class="line"></span><br><span class="line">	msg.post(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;start_game&quot;</span>)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">---@param self scripts.loader</span></span><br><span class="line"><span class="comment">---@param message_id hash</span></span><br><span class="line"><span class="comment">---@param message table</span></span><br><span class="line"><span class="comment">---@param sender url</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">on_message</span><span class="params">(self, message_id, message, sender)</span></span></span><br><span class="line">	<span class="keyword">if</span> message_id == hash(<span class="string">&quot;start_game&quot;</span>) <span class="keyword">then</span></span><br><span class="line">		msg.post(<span class="string">&quot;#game_proxy&quot;</span>, <span class="string">&quot;load&quot;</span>)</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> message_id == hash(<span class="string">&quot;proxy_loaded&quot;</span>) <span class="keyword">then</span></span><br><span class="line">		msg.post(sender, <span class="string">&quot;init&quot;</span>)</span><br><span class="line">		msg.post(sender, <span class="string">&quot;enable&quot;</span>)</span><br><span class="line">		msg.post(sender, <span class="string">&quot;acquire_input_focus&quot;</span>)</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<hr>
+<p>我們來詳細解析 <code>loader.script</code> 的程式碼，了解 Cosmic Dash 專案的啟動順序與核心系統初始化流程。</p>
+<h3 id="loader-script-整體結構與作用"><a href="#loader-script-整體結構與作用" class="headerlink" title="loader.script 整體結構與作用"></a>loader.script 整體結構與作用</h3><p><code>loader.script</code> 是專案的入口腳本，<br><br>附加在 <code>/loader.collection</code> 上。它的主要任務是：</p>
+<ol>
+<li><strong>初始化隨機種子</strong></li>
+<li><strong>設定各模組的 Logger</strong></li>
+<li><strong>初始化 Druid UI 框架</strong></li>
+<li><strong>設定視窗事件監聽</strong></li>
+<li><strong>初始化存檔系統 (Saver)</strong></li>
+<li><strong>初始化多語言系統 (Lang)</strong></li>
+<li><strong>載入 Tiled 導出的地圖資源</strong></li>
+<li><strong>發送 <code>start_game</code> 訊息，觸發後續遊戲載入</strong></li>
+</ol>
+<h3 id="詳細初始化流程（init-函式）"><a href="#詳細初始化流程（init-函式）" class="headerlink" title="詳細初始化流程（init 函式）"></a>詳細初始化流程（init 函式）</h3><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">init</span><span class="params">(self)</span></span></span><br><span class="line">    init_random(<span class="built_in">self</span>)          <span class="comment">-- 設定隨機種子，避免每次執行都一樣</span></span><br><span class="line">    init_logger(<span class="built_in">self</span>)          <span class="comment">-- 為各模組設定統一的 log 輸出</span></span><br><span class="line">    init_druid(<span class="built_in">self</span>)           <span class="comment">-- Druid UI：設定文字翻譯函式與風格調色盤</span></span><br><span class="line">    init_window_listener(<span class="built_in">self</span>) <span class="comment">-- 讓 Druid 與 Decore 能接收視窗大小變化等事件</span></span><br><span class="line">    init_saver(<span class="built_in">self</span>)           <span class="comment">-- 初始化存檔系統並綁定語言與關卡狀態</span></span><br><span class="line">    init_lang(<span class="built_in">self</span>)            <span class="comment">-- 載入 en 與 tw 語言檔（其他語言已註解）</span></span><br><span class="line">    init_detiled(<span class="built_in">self</span>)         <span class="comment">-- 載入 Tiled 導出的 tileset 資料</span></span><br><span class="line"></span><br><span class="line">    msg.post(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;start_game&quot;</span>)  <span class="comment">-- 向自身發送 start_game 訊息</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p>這些初始化幾乎涵蓋了專案所有核心第三方庫的啟動設定，<br><br>確保後續遊戲場景載入時所有系統都已準備就緒。<br><br>訊息處理：遊戲正式啟動機制（on_message）</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"> on_message(<span class="built_in">self</span>, message_id, message, sender)</span><br><span class="line">    <span class="keyword">if</span> message_id == hash(<span class="string">&quot;start_game&quot;</span>) <span class="keyword">then</span></span><br><span class="line">        msg.post(<span class="string">&quot;#game_proxy&quot;</span>, <span class="string">&quot;load&quot;</span>)</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> message_id == hash(<span class="string">&quot;proxy_loaded&quot;</span>) <span class="keyword">then</span></span><br><span class="line">        msg.post(sender, <span class="string">&quot;init&quot;</span>)</span><br><span class="line">        msg.post(sender, <span class="string">&quot;enable&quot;</span>)</span><br><span class="line">        msg.post(sender, <span class="string">&quot;acquire_input_focus&quot;</span>)</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="繼續補充：訊息處理與遊戲啟動流程"><a href="#繼續補充：訊息處理與遊戲啟動流程" class="headerlink" title="繼續補充：訊息處理與遊戲啟動流程"></a>繼續補充：訊息處理與遊戲啟動流程</h3><p><code>init()</code> 結束時會執行：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msg.post(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;start_game&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>這行程式碼會向自己發送 <code>start_game</code> 訊息。</p>
+<p>在 <code>on_message</code> 中收到 <code>start_game</code> 後：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msg.post(<span class="string">&quot;#game_proxy&quot;</span>, <span class="string">&quot;load&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>向集合中 ID 為 <code>game_proxy</code> 的遊戲物件發送 <code>&quot;load&quot;</code> 訊息。</p>
+<p><code>#game_proxy</code> 是 <code>/loader.collection</code> 中的一個 proxy 物件，用來非同步載入主要的遊戲場景。<br><code>&quot;load&quot;</code> 訊息會觸發 proxy 開始載入真正的遊戲 collection（極有可能就是包含 Panthera ECS 的 world 與所有 systems 的主場景）。</p>
+<p>當 proxy 載入完成後，Defold 引擎會自動向原本的發送者（即 loader）回傳 <code>&quot;proxy_loaded&quot;</code> 訊息。<br>loader 收到 <code>&quot;proxy_loaded&quot;</code> 後，會執行以下三行：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">msg.post(sender, <span class="string">&quot;init&quot;</span>)</span><br><span class="line">msg.post(sender, <span class="string">&quot;enable&quot;</span>)</span><br><span class="line">msg.post(sender, <span class="string">&quot;acquire_input_focus&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>&quot;init&quot;</code> → 呼叫載入完成之 collection 中所有 game object 的 <code>init()</code> 函式  </li>
+<li><code>&quot;enable&quot;</code> → 啟用所有 component，讓 <code>update()</code>、<code>fixed_update()</code> 等開始被呼叫  </li>
+<li><code>&quot;acquire_input_focus&quot;</code> → 讓新載入的場景取得輸入焦點（鍵盤、觸控等）</li>
+</ul>
+<p>這整段流程正是 Defold 官方推薦的「啟動畫面 + 非同步載入主遊戲」模式，在大中型專案中非常常見，能有效提升載入體驗。</p>
+<h4 id="推論：Panthera-ECS-何時開始運作？"><a href="#推論：Panthera-ECS-何時開始運作？" class="headerlink" title="推論：Panthera ECS 何時開始運作？"></a>推論：Panthera ECS 何時開始運作？</h4><p>根據上述流程，我們可以合理推斷：</p>
+<ul>
+<li>Panthera ECS 的 world 以及所有 systems 都位於被 <code>game_proxy</code> 載入的那個主 collection 中。  </li>
+<li>只有在收到 <code>&quot;proxy_loaded&quot;</code> 並發送 <code>&quot;init&quot;</code> 與 <code>&quot;enable&quot;</code> 之後，Panthera 的 systems 才會正式開始執行 <code>update(dt)</code> 等邏輯。</li>
+</ul>
+<p>這樣的設計確保了所有前置資源（多語言、存檔、Druid UI 風格、Tiled 地圖資料等）都已完整初始化，才進入真正的遊戲邏輯，避免潛在的空指標或資源未就緒問題。</p>
+<h4 id="小結"><a href="#小結" class="headerlink" title="小結"></a>小結</h4><p><code>loader.script</code> 的設計極為清晰且模組化：</p>
+<ol>
+<li>先完成所有全域系統的初始化  </li>
+<li>再觸發主遊戲場景的非同步載入  </li>
+<li>載入完成後才正式啟動 ECS 與遊戲邏輯</li>
+</ol>
+<p>這種分階段啟動方式，能有效避免載入期間的畫面卡頓，並嚴格保證依賴關係的正確性。</p>
+<p>下一篇文章將深入剖析 <code>game_proxy</code> 所載入的主 collection，<br><br>正式進入 Panthera ECS 的 world、systems 與 components 結構。</p>
+<p><code>ECS 專案分析：Cosmic Dash (2)：game_proxy</code></p>
+<p>敬請期待！</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://sparkerlance.github.io">sparkerlance</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章連結: </span><span class="post-copyright-info"><a href="https://sparkerlance.github.io/2026/01/08/ECS-%E5%B0%88%E6%A1%88%E5%88%86%E6%9E%90%EF%BC%9ACosmic-Dash-1-%EF%BC%9A%E4%BE%9D%E8%B3%B4%E7%AF%87/">https://sparkerlance.github.io/2026/01/08/ECS-%E5%B0%88%E6%A1%88%E5%88%86%E6%9E%90%EF%BC%9ACosmic-Dash-1-%EF%BC%9A%E4%BE%9D%E8%B3%B4%E7%AF%87/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版權聲明: </span><span class="post-copyright-info">本部落格所有文章除特別聲明外，均採用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 授權協議。轉載請註明來源 <a href="https://sparkerlance.github.io" target="_blank">SparkerLance Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/ECS/">ECS</a><a class="post-meta__tags" href="/tags/Game-Development/">Game Development</a><a class="post-meta__tags" href="/tags/Project-Analysis/">Project Analysis</a><a class="post-meta__tags" href="/tags/Defold/">Defold</a></div><div class="post-share"><div class="social-share" data-image="/img/icon.png" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/01/08/%E5%BE%9E-Overwatch-%E5%AD%B8-ECS/" title="從 Overwatch 學 ECS"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">從 Overwatch 學 ECS</div></div><div class="info-2"><div class="info-item-1">前言如果要學習一種系統設計方法，不能只是看理論，一定要去研究已在大規模實戰中驗證過的案例。  ECS（Entity Component System） 正是這類設計模式之一，而 Overwatch（守望先鋒／鬥陣特攻） 則是其成功應用於高併發即時遊戲的代表。 在數百萬玩家同時在線、長期營運與頻繁更新的條件下，仍能維持效能、穩定性與可擴充性，使它成為研究大型 ECS 與資料導向設計時非常值得參考的實例。  為什麼選擇 Overwatch 作為研究對象？ 高併發即時對戰 長期營運、系統可持續演進 高度模組化的能力與武器系統 成熟的網路同步與回放機制  非常感謝暴雪在 GDC 公開了大量系統設計概念與實作細節片段。  相關 GDC 演講資源整理（影片皆為英文，需具備基本英文聽力） 1. Overwatch Gameplay Architecture and Netcodehttps://www.youtube.com/watch?v=W3aieHjyNvw&amp;t  研究 ECS 架構與整體遊戲系統設計的核心影片。   2. GDC Networking Scripted Weap...</div></div></div></a><a class="pagination-related" href="/2026/01/07/what-is-api/" title="什麼是 API？"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">什麼是 API？</div></div><div class="info-2"><div class="info-item-1">什麼是 API？簡單來說，API 像是「語法」。不只是在前後端之間，任何套件或框架，只要要給別人使用，都一定會有 API。前端與後端溝通時，後端通常會提供一份 API 使用說明，告訴前端在什麼情況下該呼叫哪一個 API，以及會回傳哪些資料。在遊戲公司時，像是排行榜系統，前端只要呼叫對應的 API，後端就會回傳玩家的通關時間、排名、人數，或是累積遊玩時間等資料；又或者在遊戲啟動時，前端會呼叫「啟動驗證」的 API，只要驗證通過，後端就會回傳可以進入遊戲的結果。前端不需要知道後端怎麼計算排名、怎麼驗證帳號，只要依照 API 的規則呼叫，就能拿到對應的結果。同樣的概念，也會出現在使用各種套件或框架、遊戲影擎時。 舉例來說，當我在學習 ECS（Entity Component System）時，在專案裡看到了一個檔案： [API.md] 沒有使用過套件或框架的開發者會冒出一個疑問：  什麼是 API？  一、API 的白話文解釋API &#x3D;「我可以怎麼用這個東西」 API（Application Programming Interface）簡單來說就是：「這個程式／套件提供了哪些...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相關推薦</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/01/08/%E5%BE%9E-Overwatch-%E5%AD%B8-ECS/" title="從 Overwatch 學 ECS"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-08</div><div class="info-item-2">從 Overwatch 學 ECS</div></div><div class="info-2"><div class="info-item-1">前言如果要學習一種系統設計方法，不能只是看理論，一定要去研究已在大規模實戰中驗證過的案例。  ECS（Entity Component System） 正是這類設計模式之一，而 Overwatch（守望先鋒／鬥陣特攻） 則是其成功應用於高併發即時遊戲的代表。 在數百萬玩家同時在線、長期營運與頻繁更新的條件下，仍能維持效能、穩定性與可擴充性，使它成為研究大型 ECS 與資料導向設計時非常值得參考的實例。  為什麼選擇 Overwatch 作為研究對象？ 高併發即時對戰 長期營運、系統可持續演進 高度模組化的能力與武器系統 成熟的網路同步與回放機制  非常感謝暴雪在 GDC 公開了大量系統設計概念與實作細節片段。  相關 GDC 演講資源整理（影片皆為英文，需具備基本英文聽力） 1. Overwatch Gameplay Architecture and Netcodehttps://www.youtube.com/watch?v=W3aieHjyNvw&amp;t  研究 ECS 架構與整體遊戲系統設計的核心影片。   2. GDC Networking Scripted Weap...</div></div></div></a><a class="pagination-related" href="/2025/12/02/dgd-0-defold-game-development-introduction/" title="讓我們一起用 Defold 來開發遊戲"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-02</div><div class="info-item-2">讓我們一起用 Defold 來開發遊戲</div></div><div class="info-2"><div class="info-item-1">第一章：選擇 Defold 的原因在 Steam 玩遊戲模組(Mod)時，我接觸了 Lua。玩 符文工廠 3 時，我被它的插件式代碼結構所驚嘆。這款遊戲玩家可以輕鬆自定義事件內容，更換頭像或物件圖片，而不改動遊戲原本代碼。 我希望自己的遊戲也能像許多在 Steam 上擁有「創意工坊」的遊戲一樣，讓玩家自由擴充內容。在研究如何實現這個目標時，我發現 Lua 是最符合我需求的程式語言。由 C++ 封裝的開源引擎 Defold，效能出色、使用 Lua 並支持網頁輸出，完美的符合了我的需求。 雖然 Godot 也支持網頁輸出，但只能使用 GDScript。因為喜歡 Lua 的靈活、「自由」的理念，讓我選擇了 Defold。  在使用 Defold 之前，我先嘗試了同樣用Lua的兩款遊戲引擎Love2D 和 Cocos2D-x我用兩者開發了幾款小遊戲，作為選擇大型專案引擎時的參考。這兩款引擎在純代碼控制上非常好用，但網頁輸出比較麻煩，需要額外轉換。 我不喜歡「造輪子」，更希望把時間花在 真正做遊戲 上。快速迭代、打造有趣體驗，才是我的目標。比較過 Godot、Unity、Defold 的網...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">sparkerlance</div><div class="author-info-description">SparkerLance Blog</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">標籤</div><div class="length-num">23</div></a><a href="/categories/"><div class="headline">分類</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/sparkerlance"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目錄</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#ECS-%E5%B0%88%E6%A1%88%E5%88%86%E6%9E%90%EF%BC%9ACosmic-Dash-1-%EF%BC%9A%E4%BE%9D%E8%B3%B4%E7%AF%87"><span class="toc-number">1.</span> <span class="toc-text">ECS 專案分析：Cosmic Dash (1)：依賴篇</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#0-%E4%B8%8B%E8%BC%89%E6%88%96Clone%E5%B0%88%E6%A1%88"><span class="toc-number">1.1.</span> <span class="toc-text">0. 下載或Clone專案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%9F%A5%E7%9C%8B-game-project-%E4%B8%AD%E7%9A%84%E5%B0%88%E6%A1%88%E8%A8%AD%E5%AE%9A-Project"><span class="toc-number">1.2.</span> <span class="toc-text">1. 查看 game.project 中的專案設定 (Project)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Dependencies%EF%BC%88%E5%B0%88%E6%A1%88%E4%BE%9D%E8%B3%B4%E7%9A%84%E5%A4%96%E9%83%A8%E5%BA%AB%EF%BC%89"><span class="toc-number">1.2.1.</span> <span class="toc-text">Dependencies（專案依賴的外部庫）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Custom-Resources%EF%BC%88%E8%87%AA%E8%A8%82%E8%B3%87%E6%BA%90%E8%B7%AF%E5%BE%91%EF%BC%89"><span class="toc-number">1.2.2.</span> <span class="toc-text">Custom Resources（自訂資源路徑）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%9F%A5%E7%9C%8B-game-project-%E4%B8%AD%E7%9A%84%E5%B0%88%E6%A1%88%E5%85%A5%E5%8F%A3-Bootstrap"><span class="toc-number">1.3.</span> <span class="toc-text">2. 查看 game.project 中的專案入口 (Bootstrap)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%88%86%E6%9E%90%E5%85%A5%E5%8F%A3%E6%AA%94%E6%A1%88%EF%BC%9Aloader-collection"><span class="toc-number">1.4.</span> <span class="toc-text">3. 分析入口檔案：loader.collection</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#loader-script-%E6%95%B4%E9%AB%94%E7%B5%90%E6%A7%8B%E8%88%87%E4%BD%9C%E7%94%A8"><span class="toc-number">1.5.</span> <span class="toc-text">loader.script 整體結構與作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A9%B3%E7%B4%B0%E5%88%9D%E5%A7%8B%E5%8C%96%E6%B5%81%E7%A8%8B%EF%BC%88init-%E5%87%BD%E5%BC%8F%EF%BC%89"><span class="toc-number">1.6.</span> <span class="toc-text">詳細初始化流程（init 函式）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B9%BC%E7%BA%8C%E8%A3%9C%E5%85%85%EF%BC%9A%E8%A8%8A%E6%81%AF%E8%99%95%E7%90%86%E8%88%87%E9%81%8A%E6%88%B2%E5%95%9F%E5%8B%95%E6%B5%81%E7%A8%8B"><span class="toc-number">1.7.</span> <span class="toc-text">繼續補充：訊息處理與遊戲啟動流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8E%A8%E8%AB%96%EF%BC%9APanthera-ECS-%E4%BD%95%E6%99%82%E9%96%8B%E5%A7%8B%E9%81%8B%E4%BD%9C%EF%BC%9F"><span class="toc-number">1.7.1.</span> <span class="toc-text">推論：Panthera ECS 何時開始運作？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%8F%E7%B5%90"><span class="toc-number">1.7.2.</span> <span class="toc-text">小結</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/01/08/ECS-%E5%B0%88%E6%A1%88%E5%88%86%E6%9E%90%EF%BC%9ACosmic-Dash-1-%EF%BC%9A%E4%BE%9D%E8%B3%B4%E7%AF%87/" title="ECS 專案分析：Cosmic Dash (1)：依賴篇">ECS 專案分析：Cosmic Dash (1)：依賴篇</a><time datetime="2026-01-07T16:00:00.000Z" title="發表於 2026-01-08 00:00:00">2026-01-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/01/08/%E5%BE%9E-Overwatch-%E5%AD%B8-ECS/" title="從 Overwatch 學 ECS">從 Overwatch 學 ECS</a><time datetime="2026-01-07T16:00:00.000Z" title="發表於 2026-01-08 00:00:00">2026-01-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/01/07/what-is-api/" title="什麼是 API？">什麼是 API？</a><time datetime="2026-01-07T10:16:27.000Z" title="發表於 2026-01-07 18:16:27">2026-01-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/01/06/reading-notes-algorithm-survival-0/" title="演算法生存指南 - 閱讀筆記（序章）">演算法生存指南 - 閱讀筆記（序章）</a><time datetime="2026-01-06T09:05:40.000Z" title="發表於 2026-01-06 17:05:40">2026-01-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/12/28/defold-insality-plugin-study-series-0/" title="defold plugin study series [0]">defold plugin study series [0]</a><time datetime="2025-12-28T06:30:00.000Z" title="發表於 2025-12-28 14:30:00">2025-12-28</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By sparkerlance</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主題 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="閱讀模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日夜模式切換"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="單欄和雙欄切換"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="設定"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目錄"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到頂端"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.2"></script><script src="/js/main.js?v=5.5.2"></script><div class="js-pjax"></div><script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><script async data-pjax src="/"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜尋</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  資料載入中</span></div><div class="local-search-input"><input placeholder="搜尋文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.2"></script></div></div></body></html>
